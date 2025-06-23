@@ -81,7 +81,7 @@ class BankAccount:
         print(f"Created date: {self.__created_date}")
         
     def get_balance(self):
-        return self.__balance
+        print(f"Current balance: {self.__balance}")
 
 if __name__ == "__main__":
     account1 = BankAccount("John", "123456", "D/W_account", 0.02)
@@ -98,3 +98,8 @@ if __name__ == "__main__":
     account3.deposit(100000)
     account3.withdraw(50000, "123456")
     account3.show_account_info()
+    print("--------------------------------"*2)
+    account1.get_balance()
+    account2.get_balance()
+    account3.get_balance()
+    print("--------------------------------"*2)
