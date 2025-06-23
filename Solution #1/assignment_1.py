@@ -30,7 +30,7 @@ class BankAccount:
             print("Invalid amount")
         else:
             self.__balance += amount
-            return print(f"Deposit {amount} success. Current balance: {self.__balance}")
+            print(f"Deposit {amount} success. Current balance: {self.__balance}")
     
     def withdraw(self, amount, password):
         """Withdraws a specified amount from the account after verifying the password and account-specific rules."""
@@ -48,6 +48,7 @@ class BankAccount:
                 print(f"Withdraw {amount} success. Current balance: {self.__balance}")
             else:
                 print("Insufficient balance")
+                
         elif self.__account_type=="Saving_account":
             # Check if 1 year has passed since account creation
             current_date = datetime.now()
@@ -81,7 +82,7 @@ class BankAccount:
         print(f"Created date: {self.__created_date}")
         
     def get_balance(self):
-        print(f"Current balance: {self.__balance}")
+        return self.__balance
 
 if __name__ == "__main__":
     account1 = BankAccount("John", "123456", "D/W_account", 0.02)
@@ -96,10 +97,10 @@ if __name__ == "__main__":
     print("--------------------------------"*2)
     account3 = BankAccount("Jim", "123456", "minus_account", 0.01)
     account3.deposit(100000)
-    account3.withdraw(50000, "123456")
+    account3.withdraw(150000, "123456")
     account3.show_account_info()
     print("--------------------------------"*2)
-    account1.get_balance()
-    account2.get_balance()
-    account3.get_balance()
+    print(f"Account1 balance: {account1.get_balance()}")
+    print(f"Account2 balance: {account2.get_balance()}")
+    print(f"Account3 balance: {account3.get_balance()}")
     print("--------------------------------"*2)
