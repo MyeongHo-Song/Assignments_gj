@@ -2,8 +2,9 @@
 File Name: assignment_1.py
 Created Date: 2025-06-17
 Programmer: Kwanju Eun
-Description: Python class를 활용하여 다양한 유형의 은행 계좌(적금, 입출금통장, 마이너스통장)를 생성하고,
-입금과 출금 기능을 구현한다. 계좌마다 고유 ID가 자동으로 부여되며, 입출금 시 계좌 유형을 고려한다.
+Description: Create various types of bank accounts (savings, deposit/withdrawal accounts, overdraft accounts) using Python classes, 
+and implement deposit and withdrawal functions. A unique ID is automatically assigned to each account,
+and the account type is considered when depositing and withdrawing.
 """
 # Make a class for a bank account. The class contains the following attributes
 from datetime import datetime
