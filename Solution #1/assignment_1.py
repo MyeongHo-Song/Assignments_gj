@@ -20,7 +20,12 @@ class BankAccount:
         self.__id = BankAccount.Unique_id
         BankAccount.Unique_id += 1
         
+    def __del__(self):
+        """Finalizer to be called when an account object is destroyed."""
+        print(f"Account for {self.__username} (ID: {self.__id}) is being closed.")
+        
     def deposit(self, amount):
+        """Deposits a specified amount into the account."""
         if amount <= 0:
             print("Invalid amount")
         else:
@@ -28,33 +33,46 @@ class BankAccount:
             return print(f"Deposit {amount} success. Current balance: {self.__balance}")
     
     def withdraw(self, amount, password):
+        """Withdraws a specified amount from the account after verifying the password and account-specific rules."""
         if password != self.__password:
             print("Invalid password")
+            return
         
         if amount <= 0:
             print("Invalid amount")
             return
         
-        else:
-            if self.__account_type=="D/W_account":
+        if self.__account_type=="D/W_account":
+            if self.__balance >= amount:
+                self.__balance -= amount
+                print(f"Withdraw {amount} success. Current balance: {self.__balance}")
+            else:
+                print("Insufficient balance")
+        elif self.__account_type=="Saving_account":
+            # Check if 1 year has passed since account creation
+            current_date = datetime.now()
+            time_diff = current_date - self.__created_date
+            if time_diff.days >= 365:
                 if self.__balance >= amount:
                     self.__balance -= amount
                     print(f"Withdraw {amount} success. Current balance: {self.__balance}")
                 else:
                     print("Insufficient balance")
-            elif self.__account_type=="Saving_account":
-                    print("Saving_account cannot withdraw before 1 year")
-                    
-            elif self.__account_type=="minus_account":
-                if self.__balance >= -500000:
-                    self.__balance -= amount
-                    print(f"Withdraw {amount} success. Current balance: {self.__balance}")
-                else:
-                    print("Insufficient balance")
             else:
-                print("Invalid account type")
+                print("Saving_account cannot withdraw before 1 year")
+                
+        elif self.__account_type=="minus_account":
+            # Check if withdrawal would exceed the -500,000 limit
+            if self.__balance - amount >= -500000:
+                self.__balance -= amount
+                print(f"Withdraw {amount} success. Current balance: {self.__balance}")
+            else:
+                print("Insufficient balance")
+        else:
+            print("Invalid account type")
     
     def show_account_info(self):
+        """Displays the account's information."""
         print(f"Account ID: {self.__id}")
         print(f"Username: {self.__username}")
         print(f"Account type: {self.__account_type}")
