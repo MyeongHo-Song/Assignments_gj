@@ -21,7 +21,14 @@ class BankAccount:
         self.__interest_rate = interest_rate
         self.__balance = 0
         self.__created_date = datetime.now()
-        
+        self.transaction_history = []
+    
+    def add_transaction(self, amount, transaction_type):
+        """Add a transaction to the account history"""
+        transaction = Transaction(self, amount, transaction_type)
+        self.transaction_history.append(transaction)
+        return transaction
+    
     def __generate_unique_account_number(self):
         """Generate a unique 8-digit account number"""
         while True:
@@ -40,6 +47,7 @@ class BankAccount:
             print("Invalid amount")
         else:
             self.__balance += amount
+            self.add_transaction(amount, "Deposit")
             print(f"Deposit {amount} success. Current balance: {self.__balance}")
     
     def withdraw(self, amount, password):
@@ -50,6 +58,7 @@ class BankAccount:
         # Basic D/W account logic - only withdraw if sufficient balance
         if self.__balance >= amount:
             self.__balance -= amount
+            self.add_transaction(amount, "Withdrawal")
             print(f"Withdraw {amount} success. Current balance: {self.__balance}")
         else:
             print("Insufficient balance")
@@ -83,6 +92,26 @@ class BankAccount:
     
     def get_created_date(self):
         return self.__created_date
+    
+    def get_account_type(self):
+        return self.__class__.__name__
+    
+    def get_username(self):
+        return self.__username
+    
+    def get_interest_rate(self):
+        return self.__interest_rate
+        
+    def show_transaction_history(self):
+        """Display all transactions for this account"""
+        print(f"Transaction History for {self.__username}:")
+        if not self.transaction_history:
+            print("No transactions found.")
+        else:
+            for i, transaction in enumerate(self.transaction_history, 1):
+                print(f"{i}. {transaction.get_transaction_type()}: {transaction.get_amount()} at {transaction.get_transaction_date()}")
+        print()
+    
 
 
 class Transaction:
@@ -91,6 +120,15 @@ class Transaction:
         self.__amount = amount
         self.__transaction_type = transaction_type
         self.__transaction_date = datetime.now()
+        
+    def get_amount(self):
+        return self.__amount
+        
+    def get_transaction_type(self):
+        return self.__transaction_type
+        
+    def get_transaction_date(self):
+        return self.__transaction_date
         
     def show_transaction_info(self):
         print(f"Transaction type: {self.__transaction_type}")
@@ -153,7 +191,7 @@ class SavingAccount(BankAccount):
         total_amount = self.__total_deposited + interest
         
         self.__is_terminated = True
-        print(f"Contract terminated early.")
+
         print(f"Total deposited: {self.__total_deposited}")
         print(f"Interest earned (reduced rate): {interest}")
         print(f"Total amount available: {total_amount}")
@@ -313,6 +351,7 @@ if __name__ == "__main__":
     basic_account.deposit(100000)
     basic_account.withdraw(50000, "123456")
     basic_account.show_account_info()
+    basic_account.show_transaction_history()
     print("--------------------------------"*2)
     
     # Test Saving Account (Installment Savings)
@@ -353,6 +392,19 @@ if __name__ == "__main__":
     overdraft_acc.show_account_info()
     print("--------------------------------"*2)
     
-
-
+    # Test Transaction class
+    print("=== Testing Transaction Class ===")
+    # Create a transaction for deposit
+    deposit_transaction = Transaction(basic_account, 50000, "Deposit")
+    deposit_transaction.show_transaction_info()
+    print("--------------------------------"*2)
     
+    # Create a transaction for withdrawal
+    withdrawal_transaction = Transaction(basic_account, 25000, "Withdrawal")
+    withdrawal_transaction.show_transaction_info()
+    print("--------------------------------"*2)
+    
+    # Create a transaction for saving account monthly deposit
+    saving_transaction = Transaction(saving_acc, 100000, "Monthly Deposit")
+    saving_transaction.show_transaction_info()
+    print("--------------------------------"*2)
