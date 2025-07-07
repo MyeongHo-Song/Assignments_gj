@@ -192,7 +192,7 @@ class SavingAccount(BankAccount):
         interest = self.__total_deposited * self.get_interest_rate() * (self.__contract_months / 12)
         total_amount = self.__total_deposited + interest
         self.__is_matured = True
-        print(f"Contract matured successfully!")
+        print("Contract matured successfully!")
         print(f"Total deposited: {self.__total_deposited}")
         print(f"Interest earned (full rate): {interest}")
         print(f"Total amount available: {total_amount}")
@@ -241,7 +241,7 @@ class TimeDepositAccount(BankAccount):
         interest = self.get_balance() * reduced_rate * (self.__deposit_period / 365)
         total_amount = self.get_balance() + interest
         self.__is_terminated = True
-        print(f"Contract terminated early.")
+        print("Contract terminated early.")
         print(f"Original deposit: {self.get_balance()}")
         print(f"Interest earned (reduced rate): {interest}")
         print(f"Total amount available: {total_amount}")
@@ -262,7 +262,7 @@ class TimeDepositAccount(BankAccount):
         interest = self.get_balance() * self.get_interest_rate() * (self.__deposit_period / 365)
         total_amount = self.get_balance() + interest
         self.__is_matured = True
-        print(f"Contract matured successfully!")
+        print("Contract matured successfully!")
         print(f"Original deposit: {self.get_balance()}")
         print(f"Interest earned (full rate): {interest}")
         print(f"Total amount available: {total_amount}")
