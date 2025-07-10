@@ -28,13 +28,13 @@ class BankAccount(ABC):
     def __init__(self, username, password, interest_rate):
         self.__username = username
         self.__password = password
-        self.__bank_account_number = self._generate_unique_account_number()
+        self.__bank_account_number = self.generate_unique_account_number()
         self.__interest_rate = interest_rate
         self.__balance = 0
         self.__created_date = datetime.now()
         self.__transaction_history = []
 
-    def _generate_unique_account_number(self):
+    def generate_unique_account_number(self):
         while True:
             account_number = random.randint(10000000, 99999999)
             if account_number not in BankAccount.used_account_numbers:
