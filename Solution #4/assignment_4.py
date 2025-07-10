@@ -369,8 +369,8 @@ class Bank:
 
     def create_account_with_input(self):
         print("Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft")
-        acc_type = input("Choice: ").strip()
-        username = input("Enter name: ").strip()
+        acc_type = input("Choice: ")
+        username = input("Enter name: ")
         pw1 = input("Enter password: ")
         pw2 = input("Re-enter password: ")
         if pw1 != pw2:
