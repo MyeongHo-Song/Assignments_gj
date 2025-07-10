@@ -1,0 +1,364 @@
+(factory-ai) kwanjueun@venus:~/warmup_prac/Assignments_gj/Solution #4$ python assignment_4.py 
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 1
+Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft
+Choice: 1
+Enter name: kwanju_1     
+Enter password: 1234
+Re-enter password: 1234
+Enter interest rate (e.g., 0.05): 0.05
+Account created successfully!
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 0
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Deposit amount: 500000
+Deposit successful! Current balance: 500000
+[Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 2
+Withdrawal amount: 40000
+Enter password: 1234
+Withdrawal successful! Current balance: 460000
+[Withdrawal Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 3
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 460000
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 4
+Enter password: 1234
+- Try early termination:
+Normal account does not support contract termination.
+- Try maturity check:
+Normal account does not support maturity check.
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 5
+Transaction History for kwanju_1:
+1. Deposit: 500000 at 2025-07-10 11:22:53.430880
+2. Withdrawal: 40000 at 2025-07-10 11:23:00.486763
+
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 0
+Exiting.
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 2
+
+=== All Accounts in Bank ===
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 460000
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+--------------------------
+Total amount in bank: 0
+Max overdraft allowed: 0
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 1
+Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft
+Choice: 2
+Enter name: kwanju_2
+Enter password: 1234
+Re-enter password: 1234
+Enter interest rate (e.g., 0.05): 0.05
+Monthly deposit amount: 50000
+Saving period (months): 12
+Account created successfully!
+Name: kwanju_2
+Account type: SavingAccount
+Interest rate: 0.05
+Balance: 0
+Created date: 2025-07-10 11:23:33.182779
+Bank account number: 77850728
+Monthly deposit amount: 50000
+Contract period: 12 months
+Contract end date: 2026-07-05 11:23:33.182779
+Total deposited: 0
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Enter password: 1234
+Deposit successful! Current balance: 50000
+[Deposit Process Finished]
+[Monthly Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Enter password: 1234
+Deposit successful! Current balance: 100000
+[Deposit Process Finished]
+[Monthly Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 2
+Withdrawal amount: 1234
+Enter password: 1234
+Saving accounts do not support direct withdrawal. Use terminate_contract() or check_maturity().
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 3
+Name: kwanju_2
+Account type: SavingAccount
+Interest rate: 0.05
+Balance: 100000
+Created date: 2025-07-10 11:23:33.182779
+Bank account number: 77850728
+Monthly deposit amount: 50000
+Contract period: 12 months
+Contract end date: 2026-07-05 11:23:33.182779
+Total deposited: 100000
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 5
+Transaction History for kwanju_2:
+1. Deposit: 50000 at 2025-07-10 11:23:38.038982
+2. Deposit: 50000 at 2025-07-10 11:23:45.266703
+
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 0
+Exiting.
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 2
+
+=== All Accounts in Bank ===
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 460000
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+--------------------------
+Name: kwanju_2
+Account type: SavingAccount
+Interest rate: 0.05
+Balance: 100000
+Created date: 2025-07-10 11:23:33.182779
+Bank account number: 77850728
+Monthly deposit amount: 50000
+Contract period: 12 months
+Contract end date: 2026-07-05 11:23:33.182779
+Total deposited: 100000
+--------------------------
+Total amount in bank: 0
+Max overdraft allowed: 0
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 1
+Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft
+Choice: 3
+Enter name: kwanju_3
+Enter password: 1234
+Re-enter password: 1234
+Enter interest rate (e.g., 0.05): 0.05
+Deposit period (days): 365
+Account created successfully!
+Name: kwanju_3
+Account type: TimeDepositAccount
+Interest rate: 0.05
+Balance: 0
+Created date: 2025-07-10 11:25:43.272618
+Bank account number: 10063545
+Deposit period: 365 days
+Contract end date: 2026-07-10 11:25:43.272618
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Deposit amount: 500000
+Deposit successful! Current balance: 500000
+[Deposit Process Finished]
+[Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Deposit amount: 30000
+[Deposit Error] TimeDepositAccount: Only one-time deposit allowed.
+[Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 2
+Withdrawal amount: 40000
+Enter password: 1234
+Time deposit accounts do not support direct withdrawal. Use terminate_contract() or check_maturity().
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 3
+Name: kwanju_3
+Account type: TimeDepositAccount
+Interest rate: 0.05
+Balance: 500000
+Created date: 2025-07-10 11:25:43.272618
+Bank account number: 10063545
+Deposit period: 365 days
+Contract end date: 2026-07-10 11:25:43.272618
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 5
+Transaction History for kwanju_3:
+1. Deposit: 500000 at 2025-07-10 11:25:52.313203
+
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 0
+Exiting.
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 2
+
+=== All Accounts in Bank ===
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 460000
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+--------------------------
+Name: kwanju_2
+Account type: SavingAccount
+Interest rate: 0.05
+Balance: 100000
+Created date: 2025-07-10 11:23:33.182779
+Bank account number: 77850728
+Monthly deposit amount: 50000
+Contract period: 12 months
+Contract end date: 2026-07-05 11:23:33.182779
+Total deposited: 100000
+--------------------------
+Name: kwanju_3
+Account type: TimeDepositAccount
+Interest rate: 0.05
+Balance: 500000
+Created date: 2025-07-10 11:25:43.272618
+Bank account number: 10063545
+Deposit period: 365 days
+Contract end date: 2026-07-10 11:25:43.272618
+--------------------------
+Total amount in bank: 0
+Max overdraft allowed: 0
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 1
+Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft
+Choice: 4
+Enter name: kwanju_4
+Enter password: 1234
+Re-enter password: 1234
+Enter interest rate (e.g., 0.05): 0.05
+Overdraft limit: 500000
+Account created successfully!
+Name: kwanju_4
+Account type: OverdraftAccount
+Interest rate: 0.05
+Balance: 0
+Created date: 2025-07-10 11:27:38.506752
+Bank account number: 95979683
+Overdraft limit: 500000
+Available overdraft: 500000
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 1
+Deposit amount: 40000
+Deposit successful! Current balance: 40000
+[Deposit Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 2
+Withdrawal amount: 1400000
+Enter password: 1234
+[Withdraw Error] Exceeded limit. Maximum negative limit: 500000
+[Withdraw Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 2
+Withdrawal amount: 140000
+Enter password: 1234
+Withdraw 140000 success. Current balance: -100000
+[Withdraw Process Finished]
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 3
+Name: kwanju_4
+Account type: OverdraftAccount
+Interest rate: 0.05
+Balance: -100000
+Created date: 2025-07-10 11:27:38.506752
+Bank account number: 95979683
+Overdraft limit: 500000
+Available overdraft: 400000
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 5
+Transaction History for kwanju_4:
+1. Deposit: 40000 at 2025-07-10 11:27:44.914516
+2. Withdrawal: 140000 at 2025-07-10 11:28:13.988803
+
+
+1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit
+Choice: 0
+Exiting.
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 2
+
+=== All Accounts in Bank ===
+Name: kwanju_1
+Account type: NormalAccount
+Interest rate: 0.05
+Balance: 460000
+Created date: 2025-07-10 11:22:46.311854
+Bank account number: 78345534
+--------------------------
+Name: kwanju_2
+Account type: SavingAccount
+Interest rate: 0.05
+Balance: 100000
+Created date: 2025-07-10 11:23:33.182779
+Bank account number: 77850728
+Monthly deposit amount: 50000
+Contract period: 12 months
+Contract end date: 2026-07-05 11:23:33.182779
+Total deposited: 100000
+--------------------------
+Name: kwanju_3
+Account type: TimeDepositAccount
+Interest rate: 0.05
+Balance: 500000
+Created date: 2025-07-10 11:25:43.272618
+Bank account number: 10063545
+Deposit period: 365 days
+Contract end date: 2026-07-10 11:25:43.272618
+--------------------------
+Name: kwanju_4
+Account type: OverdraftAccount
+Interest rate: 0.05
+Balance: -100000
+Created date: 2025-07-10 11:27:38.506752
+Bank account number: 95979683
+Overdraft limit: 500000
+Available overdraft: 400000
+--------------------------
+Total amount in bank: 0
+Max overdraft allowed: 0
+
+1. Create Account  2. Show Bank Info  0. Exit
+Choice: 0
+Exiting.
