@@ -34,7 +34,7 @@ class BankAccount(ABC):
         self.__created_date = datetime.now()
         self.__transaction_history = []
 
-    def _generate_unique_account_number(self):
+    def generate_unique_account_number(self):
         while True:
             account_number = random.randint(10000000, 99999999)
             if account_number not in BankAccount.used_account_numbers:
