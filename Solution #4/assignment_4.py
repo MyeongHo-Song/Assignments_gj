@@ -34,7 +34,7 @@ class BankAccount(ABC):
         self.__created_date = datetime.now()
         self.__transaction_history = []
 
-    def generate_unique_account_number(self):
+    def _generate_unique_account_number(self):
         while True:
             account_number = random.randint(10000000, 99999999)
             if account_number not in BankAccount.used_account_numbers:
@@ -114,16 +114,6 @@ class BankAccount(ABC):
         print(f"Balance: {self.__balance}")
         print(f"Created date: {self.__created_date}")
         print(f"Bank account number: {self.__bank_account_number}")
-
-    def monthly_deposit(self, password):
-        print("This account does not support monthly deposit.")
-        return False
-    def terminate_contract(self, password):
-        print("This account does not support contract termination.")
-        return False
-    def check_maturity(self, password):
-        print("This account does not support maturity check.")
-        return False
 
 # ----------------------
 # Transaction
@@ -427,8 +417,15 @@ def run_account_menu(acc):
         print("\n1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit")
         sel = input("Choice: ")
         if sel == '1':
-            pw = input("Enter password: ")
-            acc.monthly_deposit(pw)
+            if hasattr(acc, 'monthly_deposit'):
+                pw = input("Enter password: ")
+                acc.monthly_deposit(pw)
+            else:
+                try:
+                    amount = int(input("Deposit amount: "))
+                    acc.deposit(amount)
+                except Exception as e:
+                    print(f"[Deposit Error] {e}")
         elif sel == '2':
             try:
                 amount = int(input("Withdrawal amount: "))
@@ -439,13 +436,21 @@ def run_account_menu(acc):
         elif sel == '3':
             acc.show_account_info()
         elif sel == '4':
-            pw = input("Enter password: ")
-            print("- Try early termination:")
-            acc.terminate_contract(pw)
-            print("- Try maturity check:")
-            acc.check_maturity(pw)
+            if hasattr(acc, 'terminate_contract') or hasattr(acc, 'check_maturity'):
+                pw = input("Enter password: ")
+                if hasattr(acc, 'terminate_contract'):
+                    print("- Try early termination:")
+                    acc.terminate_contract(pw)
+                if hasattr(acc, 'check_maturity'):
+                    print("- Try maturity check:")
+                    acc.check_maturity(pw)
+            else:
+                print("[Info] Normal account has no maturity/terminate function.")
         elif sel == '5':
-            acc.show_transaction_history()
+            if hasattr(acc, 'show_transaction_history'):
+                acc.show_transaction_history()
+            else:
+                print("No transaction history available.")
         elif sel == '0':
             print("Exiting.")
             break
