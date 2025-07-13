@@ -13,11 +13,34 @@ import random
 # Custom Exceptions
 # ----------------------
 class InvalidPasswordError(Exception):
-    pass
+    def __init__(self, message="Incorrect password provided"):
+        self.message = message
+        super().__init__(self.message)
+    
+    def __str__(self):
+        return f"Password Error: {self.message}"
+
 class InvalidAmountError(Exception):
-    pass
+    def __init__(self, message="Invalid amount provided"):
+        self.message = message
+        super().__init__(self.message)
+    
+    def __str__(self):
+        return f"Amount Error: {self.message}"
+    
+    def get_error_type(self):
+        return "AMOUNT_VALIDATION_ERROR"
+
 class ContractValueError(Exception):
-    pass
+    def __init__(self, message="Contract operation failed"):
+        self.message = message
+        super().__init__(self.message)
+    
+    def __str__(self):
+        return f"Contract Error: {self.message}"
+    
+    def is_contract_related(self):
+        return True
 
 # ----------------------
 # Abstract BankAccount
@@ -44,6 +67,9 @@ class BankAccount(ABC):
     def add_transaction(self, amount, transaction_type):
         transaction = Transaction(self, amount, transaction_type)
         self.__transaction_history.append(transaction)
+        # Also add to bank's global transaction history if bank reference is available
+        if hasattr(self, '_bank_reference') and self._bank_reference:
+            self._bank_reference.add_transaction_to_history(transaction)
         return transaction
 
     def deposit(self, amount):
@@ -54,7 +80,7 @@ class BankAccount(ABC):
             self.add_transaction(amount, "Deposit")
             print(f"Deposit successful! Current balance: {self.__balance}")
         except InvalidAmountError as e:
-            print(f"[Deposit Error] {e}")
+            print(f"[{e.get_error_type()}] {e}")
         finally:
             print("[Deposit Process Finished]")
 
@@ -70,17 +96,15 @@ class BankAccount(ABC):
             self.add_transaction(amount, "Withdrawal")
             print(f"Withdrawal successful! Current balance: {self.__balance}")
         except (InvalidPasswordError, InvalidAmountError) as e:
-            print(f"[Withdrawal Error] {e}")
+            if isinstance(e, InvalidPasswordError):
+                print(f"[PASSWORD_ERROR] {e}")
+            elif isinstance(e, InvalidAmountError):
+                print(f"[{e.get_error_type()}] {e}")
+            else:
+                print(f"[Withdrawal Error] {e}")
         finally:
             print("[Withdrawal Process Finished]")
 
-    @abstractmethod
-    def check_maturity(self, password):
-        pass
-
-    @abstractmethod
-    def terminate_contract(self, password):
-        pass
 
     # Getter methods (strict encapsulation)
     def get_balance(self):
@@ -124,17 +148,29 @@ class Transaction:
         self.__amount = amount
         self.__transaction_type = transaction_type
         self.__transaction_date = datetime.now()
+        self.__account_number = account.get_account_number()
+        self.__username = account.get_username()
+        self.__account_type = account.get_account_type()
+    
     def get_amount(self):
         return self.__amount
     def get_transaction_type(self):
         return self.__transaction_type
     def get_transaction_date(self):
         return self.__transaction_date
+    def get_account_number(self):
+        return self.__account_number
+    def get_username(self):
+        return self.__username
+    def get_account_type(self):
+        return self.__account_type
     def show_transaction_info(self):
         print(f"Transaction type: {self.__transaction_type}")
         print(f"Transaction amount: {self.__amount}")
         print(f"Transaction date: {self.__transaction_date}")
-        print(f"Account balance: {self.__account.get_balance()}")
+        print(f"Account: {self.__username} ({self.__account_type}) - {self.__account_number}")
+        if hasattr(self.__account, 'get_balance'):
+            print(f"Account balance: {self.__account.get_balance()}")
 
 # ----------------------
 # SavingAccount
@@ -150,76 +186,71 @@ class SavingAccount(BankAccount):
         self.__is_matured = False
 
     def deposit(self, amount):
-        print("SavingAccount: Use monthly_deposit() instead of direct deposit.")
-        return False
-
-    def monthly_deposit(self, password):
         try:
-            if password != self.get_password():
-                raise InvalidPasswordError("Incorrect password.")
+            # SavingAccount only allows monthly_amount deposit
+            if amount != self.__monthly_amount:
+                raise InvalidAmountError(f"SavingAccount: Only monthly amount ({self.__monthly_amount}) is allowed.")
             if self.__is_terminated or self.__is_matured:
                 raise ContractValueError("Contract is terminated or matured. Cannot deposit.")
             current_date = datetime.now()
             if current_date > self.__contract_end_date:
                 raise ContractValueError("Contract period has ended. Cannot deposit.")
             self.__total_deposited += self.__monthly_amount
-            return super().deposit(self.__monthly_amount)
-        except (InvalidPasswordError, ContractValueError) as e:
-            print(f"[Monthly Deposit Error] {e}")
+            # Use parent class deposit method
+            super().deposit(self.__monthly_amount)
+            return True
+        except (InvalidAmountError, ContractValueError) as e:
+            print(f"[{e.get_error_type()}] {e}")
             return False
         finally:
-            print("[Monthly Deposit Process Finished]")
+            print("[Deposit Process Finished]")
 
     def withdraw(self, amount, password):
-        print("Saving accounts do not support direct withdrawal. Use terminate_contract() or check_maturity().")
-        return False
-
-    def terminate_contract(self, password):
         try:
             if password != self.get_password():
                 raise InvalidPasswordError("Incorrect password.")
+            
+            # SavingAccount has special withdraw conditions
             if self.__is_terminated or self.__is_matured:
                 raise ContractValueError("Contract is already terminated or matured.")
-            current_date = datetime.now()
-            if current_date >= self.__contract_end_date:
-                raise ContractValueError("Contract period has already ended. Please use maturity check.")
-            reduced_rate = self.get_interest_rate() * 0.1
-            interest = self.__total_deposited * reduced_rate * (self.__contract_months / 12)
-            total_amount = self.__total_deposited + interest
-            self.__is_terminated = True
-            print(f"Total deposited: {self.__total_deposited}")
-            print(f"Interest earned (reduced rate): {interest}")
-            print(f"Total amount available: {total_amount}")
-            return total_amount
-        except (InvalidPasswordError, ContractValueError) as e:
-            print(f"[Terminate Contract Error] {e}")
-            return False
-        finally:
-            print("[Terminate Contract Process Finished]")
-
-    def check_maturity(self, password):
-        try:
-            if password != self.get_password():
-                raise InvalidPasswordError("Incorrect password.")
-            if self.__is_terminated or self.__is_matured:
-                raise ContractValueError("Contract is already terminated or matured.")
+            
             current_date = datetime.now()
             if current_date < self.__contract_end_date:
-                remaining_days = (self.__contract_end_date - current_date).days
-                raise ContractValueError(f"Contract is not matured yet. {remaining_days} days remaining.")
-            interest = self.__total_deposited * self.get_interest_rate() * (self.__contract_months / 12)
-            total_amount = self.__total_deposited + interest
-            self.__is_matured = True
-            print("Contract matured successfully!")
-            print(f"Total deposited: {self.__total_deposited}")
-            print(f"Interest earned (full rate): {interest}")
-            print(f"Total amount available: {total_amount}")
-            return total_amount
+                # Within contract period: early termination (reduced interest)
+                reduced_rate = self.get_interest_rate() * 0.1
+                interest = self.__total_deposited * reduced_rate * (self.__contract_months / 12)
+                total_amount = self.__total_deposited + interest
+                self.__is_terminated = True
+                print("Contract terminated early.")
+                print(f"Total deposited: {self.__total_deposited}")
+                print(f"Interest earned (reduced rate): {interest}")
+                print(f"Total amount available: {total_amount}")
+                # Use parent class withdraw method
+                super().withdraw(total_amount, password)
+                return True
+            else:
+                # Contract expired: maturity termination (full interest)
+                interest = self.__total_deposited * self.get_interest_rate() * (self.__contract_months / 12)
+                total_amount = self.__total_deposited + interest
+                self.__is_matured = True
+                print("Contract matured successfully!")
+                print(f"Total deposited: {self.__total_deposited}")
+                print(f"Interest earned (full rate): {interest}")
+                print(f"Total amount available: {total_amount}")
+                # Use parent class withdraw method
+                super().withdraw(total_amount, password)
+                return True
+                
         except (InvalidPasswordError, ContractValueError) as e:
-            print(f"[Maturity Check Error] {e}")
+            if isinstance(e, InvalidPasswordError):
+                print(f"[PASSWORD_ERROR] {e}")
+            elif isinstance(e, ContractValueError):
+                print(f"[CONTRACT_ERROR] {e}")
+            else:
+                print(f"[Withdraw Error] {e}")
             return False
         finally:
-            print("[Maturity Check Process Finished]")
+            print("[Withdraw Process Finished]")
 
     def show_account_info(self):
         super().show_account_info()
@@ -241,66 +272,64 @@ class TimeDepositAccount(BankAccount):
 
     def deposit(self, amount):
         try:
+            # TimeDepositAccount only allows one-time deposit
             if self.get_balance() > 0:
                 raise InvalidAmountError("TimeDepositAccount: Only one-time deposit allowed.")
-            return super().deposit(amount)
+            # Use parent class deposit method
+            super().deposit(amount)
+            return True
         except InvalidAmountError as e:
-            print(f"[Deposit Error] {e}")
+            print(f"[{e.get_error_type()}] {e}")
             return False
         finally:
             print("[Deposit Process Finished]")
 
     def withdraw(self, amount, password):
-        print("Time deposit accounts do not support direct withdrawal. Use terminate_contract() or check_maturity().")
-        return False
-
-    def terminate_contract(self, password):
         try:
             if password != self.get_password():
                 raise InvalidPasswordError("Incorrect password.")
+            
+            # TimeDepositAccount has special withdraw conditions
             if self.__is_terminated or self.__is_matured:
                 raise ContractValueError("Contract is already terminated or matured.")
-            current_date = datetime.now()
-            if current_date >= self.__contract_end_date:
-                raise ContractValueError("Contract period has already ended. Please use maturity check.")
-            reduced_rate = self.get_interest_rate() * 0.1
-            interest = self.get_balance() * reduced_rate * (self.__deposit_period / 365)
-            total_amount = self.get_balance() + interest
-            self.__is_terminated = True
-            print("Contract terminated early.")
-            print(f"Original deposit: {self.get_balance()}")
-            print(f"Interest earned (reduced rate): {interest}")
-            print(f"Total amount available: {total_amount}")
-            return total_amount
-        except (InvalidPasswordError, ContractValueError) as e:
-            print(f"[Terminate Contract Error] {e}")
-            return False
-        finally:
-            print("[Terminate Contract Process Finished]")
-
-    def check_maturity(self, password):
-        try:
-            if password != self.get_password():
-                raise InvalidPasswordError("Incorrect password.")
-            if self.__is_terminated or self.__is_matured:
-                raise ContractValueError("Contract is already terminated or matured.")
+            
             current_date = datetime.now()
             if current_date < self.__contract_end_date:
-                remaining_days = (self.__contract_end_date - current_date).days
-                raise ContractValueError(f"Contract is not matured yet. {remaining_days} days remaining.")
-            interest = self.get_balance() * self.get_interest_rate() * (self.__deposit_period / 365)
-            total_amount = self.get_balance() + interest
-            self.__is_matured = True
-            print("Contract matured successfully!")
-            print(f"Original deposit: {self.get_balance()}")
-            print(f"Interest earned (full rate): {interest}")
-            print(f"Total amount available: {total_amount}")
-            return total_amount
+                # Within contract period: early termination (reduced interest)
+                reduced_rate = self.get_interest_rate() * 0.1
+                interest = self.get_balance() * reduced_rate * (self.__deposit_period / 365)
+                total_amount = self.get_balance() + interest
+                self.__is_terminated = True
+                print("Contract terminated early.")
+                print(f"Original deposit: {self.get_balance()}")
+                print(f"Interest earned (reduced rate): {interest}")
+                print(f"Total amount available: {total_amount}")
+                # Use parent class withdraw method
+                super().withdraw(total_amount, password)
+                return True
+            else:
+                # Contract expired: maturity termination (full interest)
+                interest = self.get_balance() * self.get_interest_rate() * (self.__deposit_period / 365)
+                total_amount = self.get_balance() + interest
+                self.__is_matured = True
+                print("Contract matured successfully!")
+                print(f"Original deposit: {self.get_balance()}")
+                print(f"Interest earned (full rate): {interest}")
+                print(f"Total amount available: {total_amount}")
+                # Use parent class withdraw method
+                super().withdraw(total_amount, password)
+                return True
+                
         except (InvalidPasswordError, ContractValueError) as e:
-            print(f"[Maturity Check Error] {e}")
+            if isinstance(e, InvalidPasswordError):
+                print(f"[PASSWORD_ERROR] {e}")
+            elif isinstance(e, ContractValueError):
+                print(f"[CONTRACT_ERROR] {e}")
+            else:
+                print(f"[Withdraw Error] {e}")
             return False
         finally:
-            print("[Maturity Check Process Finished]")
+            print("[Withdraw Process Finished]")
 
     def show_account_info(self):
         super().show_account_info()
@@ -321,25 +350,24 @@ class OverdraftAccount(BankAccount):
                 raise InvalidPasswordError("Incorrect password.")
             if amount <= 0:
                 raise InvalidAmountError("Withdrawal amount must be greater than 0.")
+            # OverdraftAccount has additional condition: overdraft limit check
             if self.get_balance() - amount < -self.__overdraft_limit:
                 raise InvalidAmountError(f"Exceeded limit. Maximum negative limit: {self.__overdraft_limit}")
+            # Directly implement withdraw logic (balance update)
             self._BankAccount__balance -= amount
             self.add_transaction(amount, "Withdrawal")
             print(f"Withdraw {amount} success. Current balance: {self.get_balance()}")
             return True
         except (InvalidPasswordError, InvalidAmountError) as e:
-            print(f"[Withdraw Error] {e}")
+            if isinstance(e, InvalidPasswordError):
+                print(f"[PASSWORD_ERROR] {e}")
+            elif isinstance(e, InvalidAmountError):
+                print(f"[{e.get_error_type()}] {e}")
+            else:
+                print(f"[Withdraw Error] {e}")
             return False
         finally:
             print("[Withdraw Process Finished]")
-
-    def terminate_contract(self, password):
-        print("Overdraft accounts do not support contract termination.")
-        return False
-
-    def check_maturity(self, password):
-        print("Overdraft accounts do not have maturity.")
-        return False
 
     def show_account_info(self):
         super().show_account_info()
@@ -350,12 +378,8 @@ class OverdraftAccount(BankAccount):
 # NormalAccount
 # ----------------------
 class NormalAccount(BankAccount):
-    def check_maturity(self, password):
-        print("Normal account does not support maturity check.")
-        return False
-    def terminate_contract(self, password):
-        print("Normal account does not support contract termination.")
-        return False
+    # NormalAccount uses all methods from parent class directly
+    pass
 
 # ----------------------
 # Bank Class
@@ -366,6 +390,31 @@ class Bank:
         self.account_numbers = set()
         self.total_amount = 0
         self.max_overdraft = 0
+        self.all_transactions = []  # Store all transactions from all accounts
+
+    def add_transaction_to_history(self, transaction):
+        """Add transaction to bank's global transaction history"""
+        self.all_transactions.append(transaction)
+
+    def get_transactions_by_account_number(self, account_number):
+        """Get all transactions for a specific account number"""
+        return [t for t in self.all_transactions if t.get_account_number() == account_number]
+
+    def get_transactions_by_username(self, username):
+        """Get all transactions for a specific username"""
+        return [t for t in self.all_transactions if t.get_username() == username]
+
+    def update_total_amount(self):
+        """Update total amount in bank by summing all account balances"""
+        self.total_amount = sum(acc.get_balance() for acc in self.accounts)
+
+    def update_max_overdraft(self):
+        """Update maximum overdraft amount"""
+        overdraft_accounts = [acc for acc in self.accounts if isinstance(acc, OverdraftAccount)]
+        if overdraft_accounts:
+            self.max_overdraft = sum(acc._OverdraftAccount__overdraft_limit for acc in overdraft_accounts)
+        else:
+            self.max_overdraft = 0
 
     def create_account_with_input(self):
         print("Select account type: 1. Normal 2. Saving 3. TimeDeposit 4. Overdraft")
@@ -393,7 +442,13 @@ class Bank:
             else:
                 print("[Account Creation Error] Invalid account type selection.")
                 return None
+            
+            # Set bank reference for transaction tracking
+            acc._bank_reference = self
+            
             self.accounts.append(acc)
+            self.update_total_amount()
+            self.update_max_overdraft()
             print("Account created successfully!")
             acc.show_account_info()
             return acc
@@ -402,75 +457,214 @@ class Bank:
             return None
 
     def show_all_accounts(self):
+        self.update_total_amount()
+        self.update_max_overdraft()
         print("\n=== All Accounts in Bank ===")
         for acc in self.accounts:
             acc.show_account_info()
             print("--------------------------")
         print(f"Total amount in bank: {self.total_amount}")
         print(f"Max overdraft allowed: {self.max_overdraft}")
-        
+
 # ----------------------
-# Menu function for each account type
+# Helper functions
 # ----------------------
-def run_account_menu(acc):
-    while True:
-        print("\n1. Deposit  2. Withdraw  3. Account Info  4. Maturity/Terminate  5. Transaction History  0. Exit")
-        sel = input("Choice: ")
-        if sel == '1':
-            if hasattr(acc, 'monthly_deposit'):
-                pw = input("Enter password: ")
-                acc.monthly_deposit(pw)
-            else:
-                try:
-                    amount = int(input("Deposit amount: "))
-                    acc.deposit(amount)
-                except Exception as e:
-                    print(f"[Deposit Error] {e}")
-        elif sel == '2':
-            try:
-                amount = int(input("Withdrawal amount: "))
-                pw = input("Enter password: ")
-                acc.withdraw(amount, pw)
-            except Exception as e:
-                print(f"[Withdrawal Error] {e}")
-        elif sel == '3':
-            acc.show_account_info()
-        elif sel == '4':
-            if hasattr(acc, 'terminate_contract') or hasattr(acc, 'check_maturity'):
-                pw = input("Enter password: ")
-                if hasattr(acc, 'terminate_contract'):
-                    print("- Try early termination:")
-                    acc.terminate_contract(pw)
-                if hasattr(acc, 'check_maturity'):
-                    print("- Try maturity check:")
-                    acc.check_maturity(pw)
-            else:
-                print("[Info] Normal account has no maturity/terminate function.")
-        elif sel == '5':
-            if hasattr(acc, 'show_transaction_history'):
-                acc.show_transaction_history()
-            else:
-                print("No transaction history available.")
-        elif sel == '0':
-            print("Exiting.")
-            break
-        else:
-            print("Invalid choice.")
+def select_account(bank):
+    """Helper function to select an account"""
+    if not bank.accounts:
+        print("No accounts exist. Please create an account first.")
+        return None
+    
+    print("\n=== Select Account ===")
+    for i, acc in enumerate(bank.accounts, 1):
+        print(f"{i}. {acc.get_username()} - {acc.get_account_type()} (Account: {acc.get_account_number()})")
+    
+    choice = input("Enter account number or list number: ")
+    
+    # Try to find by account number first
+    for acc in bank.accounts:
+        if str(acc.get_account_number()) == choice:
+            return acc
+    
+    # If not found by account number, try list number
+    try:
+        list_num = int(choice)
+        if 1 <= list_num <= len(bank.accounts):
+            return bank.accounts[list_num - 1]
+    except ValueError:
+        pass
+    
+    print(f"Account not found. Please enter a valid account number or list number (1-{len(bank.accounts)}).")
+    return None
+
+def handle_deposit(account, bank):
+    """Helper function to handle deposit"""
+    try:
+        amount = int(input("Deposit amount: "))
+        account.deposit(amount)
+        bank.update_total_amount()
+    except Exception as e:
+        print(f"[Deposit Error] {e}")
+
+def handle_withdraw(account, bank):
+    """Helper function to handle withdraw/terminate"""
+    if hasattr(account, '_SavingAccount__contract_end_date') or hasattr(account, '_TimeDepositAccount__contract_end_date'):
+        # Contract-based accounts: terminate/maturity
+        try:
+            pw = input("Enter password: ")
+            print("- Processing contract termination/maturity:")
+            
+            # Store account info before termination
+            username = account.get_username()
+            password = account.get_password()
+            interest_rate = account.get_interest_rate()
+            
+            # Process termination/maturity
+            result = account.withdraw(0, pw)
+            bank.update_total_amount()
+            
+            if result:
+                # Get the withdrawn amount (total amount after termination)
+                withdrawn_amount = 0
+                if hasattr(account, '_SavingAccount__total_deposited'):
+                    # SavingAccount: calculate total amount
+                    if account._SavingAccount__is_terminated:
+                        reduced_rate = account.get_interest_rate() * 0.1
+                        interest = account._SavingAccount__total_deposited * reduced_rate * (account._SavingAccount__contract_months / 12)
+                        withdrawn_amount = account._SavingAccount__total_deposited + interest
+                    elif account._SavingAccount__is_matured:
+                        interest = account._SavingAccount__total_deposited * account.get_interest_rate() * (account._SavingAccount__contract_months / 12)
+                        withdrawn_amount = account._SavingAccount__total_deposited + interest
+                elif hasattr(account, '_TimeDepositAccount__deposit_period'):
+                    # TimeDepositAccount: calculate total amount
+                    if account._TimeDepositAccount__is_terminated:
+                        reduced_rate = account.get_interest_rate() * 0.1
+                        interest = account.get_balance() * reduced_rate * (account._TimeDepositAccount__deposit_period / 365)
+                        withdrawn_amount = account.get_balance() + interest
+                    elif account._TimeDepositAccount__is_matured:
+                        interest = account.get_balance() * account.get_interest_rate() * (account._TimeDepositAccount__deposit_period / 365)
+                        withdrawn_amount = account.get_balance() + interest
+                
+                if withdrawn_amount > 0:
+                    # Create new NormalAccount with withdrawn amount
+                    new_account = NormalAccount(username, password, interest_rate)
+                    new_account._bank_reference = bank  # Set bank reference
+                    new_account.deposit(withdrawn_amount)
+                    bank.accounts.append(new_account)
+                    bank.update_total_amount()
+                    
+                    # Add contract termination transaction to global history
+                    termination_transaction = Transaction(account, withdrawn_amount, "Contract Termination")
+                    bank.add_transaction_to_history(termination_transaction)
+                    
+                    # Remove the old contract account
+                    bank.accounts.remove(account)
+                    
+                    print(f"Contract account closed. New NormalAccount created with {withdrawn_amount}.")
+                    print(f"New account number: {new_account.get_account_number()}")
+                    print("Transaction history has been preserved.")
+                    
+                    # Return to main menu to select new account
+                    return "new_account_created"
+            
+        except Exception as e:
+            print(f"[Contract Error] {e}")
+    else:
+        # Normal accounts: regular withdraw
+        try:
+            amount = int(input("Withdrawal amount: "))
+            pw = input("Enter password: ")
+            account.withdraw(amount, pw)
+            bank.update_total_amount()
+        except Exception as e:
+            print(f"[Withdrawal Error] {e}")
+    
+    return None
+
+def show_main_menu():
+    """Helper function to show main menu"""
+    print("\n1. Create Account  2. Select Account  3. Show Bank Info  4. Show All Transactions  0. Exit")
+
+def show_account_menu(account):
+    """Helper function to show account menu"""
+    print(f"\n=== {account.get_username()}'s {account.get_account_type()} ===")
+    if hasattr(account, '_SavingAccount__contract_end_date') or hasattr(account, '_TimeDepositAccount__contract_end_date'):
+        print("1. Deposit  2. Terminate/Maturity  3. Account Info  4. Transaction History  5. Back to Main Menu  0. Exit")
+    else:
+        print("1. Deposit  2. Withdraw  3. Account Info  4. Transaction History  5. Back to Main Menu  0. Exit")
 
 # Main loop
 if __name__ == "__main__":
     bank = Bank()
+    selected_acc = None
+    
     while True:
-        print("\n1. Create Account  2. Show Bank Info  0. Exit")
-        sel = input("Choice: ")
-        if sel == '1':
-            acc = bank.create_account_with_input()
-            if acc:
-                run_account_menu(acc)
-        elif sel == '2':
-            bank.show_all_accounts()
-        elif sel == '0':
-            print("Exiting.")
-            break
+        if selected_acc is None:
+            # Main menu
+            show_main_menu()
+            sel = input("Choice: ")
+            
+            if sel == '1':
+                acc = bank.create_account_with_input()
+                if acc:
+                    print("Account created successfully!")
+            elif sel == '2':
+                selected_acc = select_account(bank)
+                if selected_acc:
+                    print(f"Selected: {selected_acc.get_username()}'s {selected_acc.get_account_type()}")
+            elif sel == '3':
+                bank.show_all_accounts()
+            elif sel == '4':
+                if not bank.accounts and not bank.all_transactions:
+                    print("No accounts or transactions exist. Please create an account first.")
+                    continue
+                print("\n=== All Transactions ===")
+                
+                # Show transactions by username (including closed accounts)
+                usernames = set()
+                for acc in bank.accounts:
+                    usernames.add(acc.get_username())
+                for transaction in bank.all_transactions:
+                    usernames.add(transaction.get_username())
+                
+                for username in sorted(usernames):
+                    print(f"\n--- {username} ---")
+                    user_transactions = bank.get_transactions_by_username(username)
+                    if user_transactions:
+                        for i, transaction in enumerate(user_transactions, 1):
+                            print(f"{i}. {transaction.get_transaction_type()}: {transaction.get_amount()} at {transaction.get_transaction_date()}")
+                            print(f"   Account: {transaction.get_account_type()} - {transaction.get_account_number()}")
+                    else:
+                        print("No transactions found.")
+            elif sel == '0':
+                print("Exiting.")
+                break
+            else:
+                print("Invalid choice.")
         else:
-            print("Invalid choice.")
+            # Account menu
+            show_account_menu(selected_acc)
+            sel = input("Choice: ")
+            
+            if sel == '1':
+                handle_deposit(selected_acc, bank)
+            elif sel == '2':
+                result = handle_withdraw(selected_acc, bank)
+                if result == "new_account_created":
+                    selected_acc = None  # Return to main menu
+                    print("Please select your new account from the main menu.")
+            elif sel == '3':
+                selected_acc.show_account_info()
+            elif sel == '4':
+                if hasattr(selected_acc, 'show_transaction_history'):
+                    selected_acc.show_transaction_history()
+                else:
+                    print("No transaction history available.")
+            elif sel == '5':
+                selected_acc = None
+                print("Returned to main menu.")
+            elif sel == '0':
+                print("Exiting.")
+                break
+            else:
+                print("Invalid choice.")
