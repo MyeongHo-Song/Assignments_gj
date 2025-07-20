@@ -1,6 +1,8 @@
 """
-accounts/base.py
-Base account classes for the bank system
+File Name: accounts/base.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Base account classes for the bank system
 """
 from datetime import datetime, timedelta
 from exceptions import InvalidPasswordError, InvalidAmountError, ContractValueError

@@ -1,6 +1,8 @@
 """
-transaction.py
-Transaction class for recording banking transactions
+File Name: transaction.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Transaction class for recording banking transactions
 """
 from datetime import datetime
 

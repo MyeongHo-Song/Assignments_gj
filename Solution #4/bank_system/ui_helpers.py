@@ -1,6 +1,8 @@
 """
-ui_helpers.py
-Helper functions for user interface operations
+File Name: ui_helpers.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Helper functions for user interface operations
 """
 from accounts.base import BankAccount
 from accounts.types import SavingAccount, TimeDepositAccount, OverdraftAccount

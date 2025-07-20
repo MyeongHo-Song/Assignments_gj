@@ -1,6 +1,8 @@
 """
-accounts/types.py
-Specific account type implementations
+File Name: accounts/types.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Specific account type implementations
 """
 from datetime import datetime, timedelta
 from accounts.base import BankAccount, ContractAccount

@@ -1,6 +1,8 @@
 """
-exceptions.py
-Custom exceptions for the bank system
+File Name: exceptions.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Custom exceptions for the bank system
 """
 
 class InvalidPasswordError(Exception):

@@ -1,6 +1,8 @@
 """
-bank.py
-Core bank class that manages accounts and transactions
+File Name: bank.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Core bank class that manages accounts and transactions
 """
 import random
 from transaction import Transaction
@@ -16,7 +18,7 @@ class Bank:
         self.__transactions = []
         self.__used_account_numbers = set()
 
-    def _generate_unique_account_number(self):
+    def generate_unique_account_number(self):
         """Generate unique account number"""
         while True:
             account_number = random.randint(10000000, 99999999)
@@ -36,7 +38,7 @@ class Bank:
             raise ValueError("Invalid account type")
         
         # Set account number and bank reference
-        account_number = self._generate_unique_account_number()
+        account_number = self.generate_unique_account_number()
         account.set_account_number(account_number)
         account.set_bank(self)
         

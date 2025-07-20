@@ -1,6 +1,8 @@
 """
-main.py
-Main entry point for the bank system application
+File Name: main.py
+Created Date: 2025-07-19
+Programmer: Kwanju Eun
+Description: Main entry point for the bank system application
 """
 from bank import Bank
 from accounts.types import SavingAccount, TimeDepositAccount
